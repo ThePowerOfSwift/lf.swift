@@ -223,10 +223,6 @@ open class RTMPStream: NetStream {
     open internal(set) var info:RTMPStreamInfo = RTMPStreamInfo()
     open fileprivate(set) var objectEncoding:UInt8 = RTMPConnection.defaultObjectEncoding
     open fileprivate(set) dynamic var currentFPS:UInt16 = 0
-    open var soundTransform:SoundTransform {
-        get { return audioPlayback.soundTransform }
-        set { audioPlayback.soundTransform = newValue }
-    }
 
     var id:UInt32 = RTMPStream.defaultID
     var readyState:ReadyState = .initialized {
@@ -238,7 +234,6 @@ open class RTMPStream: NetStream {
                 info.clear()
                 qosStrategy.clear()
             case .playing:
-                audioPlayback.startRunning()
                 mixer.startPlaying()
             case .publishing:
                 send(handlerName: "@setDataFrame", arguments: "onMetaData", createMetaData())
@@ -253,7 +248,6 @@ open class RTMPStream: NetStream {
                 switch oldValue {
                 case .playing:
                     mixer.stopPlaying()
-                    audioPlayback.stopRunning()
                 default:
                     break
                 }
@@ -265,7 +259,6 @@ open class RTMPStream: NetStream {
 
     var audioTimestamp:Double = 0
     var videoTimestamp:Double = 0
-    fileprivate(set) var audioPlayback:RTMPAudioPlayback = RTMPAudioPlayback()
     fileprivate(set) var muxer:RTMPMuxer = RTMPMuxer()
     fileprivate var paused:Bool = false
     fileprivate var sampler:MP4Sampler? = nil
